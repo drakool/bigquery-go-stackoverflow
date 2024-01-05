@@ -33,13 +33,34 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-// [END bigquery_simple_app_deps]
+func getAllPosts(c echo.Context) error {
+
+	return c.JSON(http.StatusOK, posts)
+
+}
 
 func main() {
-	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
+
+	projectID := os.Getenv("PROJECT_ID")
 	if projectID == "" {
 		fmt.Println("GOOGLE_CLOUD_PROJECT environment variable must be set.")
 		os.Exit(1)
+	}
+
+	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.GET("/posts", getAllPosts)
+
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
+	})
+
+	httpPort := os.Getenv("PORT")
+	if httpPort == "" {
+		httpPort = "8080"
 	}
 
 	// [START bigquery_simple_app_client]
@@ -56,9 +77,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := printResults(os.Stdout, rows); err != nil {
+
+	/*if err := printResults(os.Stdout, rows); err != nil {
+		log.Fatal(err)
+	}*/
+
+	if err := getPosts(rows); err != nil {
 		log.Fatal(err)
 	}
+
+	e.Logger.Fatal(e.Start(":" + httpPort))
+
 }
 
 // query returns a row iterator suitable for reading query results.
@@ -93,6 +122,28 @@ type StackOverflowRow struct {
 	Score        int64     `bigquery:"score"`
 	AnswerCount  int64     `bigquery:"answer_count"`
 	CreationDate time.Time `bigquery:"creation_date"`
+}
+
+var (
+	posts []StackOverflowRow
+)
+
+func getPosts(iter *bigquery.RowIterator) error {
+
+	for {
+		var row StackOverflowRow
+		err := iter.Next(&row)
+
+		if err == iterator.Done {
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf("error iterating through results: %w", err)
+		}
+		posts = append(posts, row)
+		//fmt.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
+		//fmt.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
+	}
 }
 
 // printResults prints results from a query to the Stack Overflow public dataset.
