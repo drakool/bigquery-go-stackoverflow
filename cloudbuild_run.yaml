@@ -47,5 +47,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', '${_APP_NAME}', 
-  '--image=europe-west4-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}', 
+  '--image=europe-west4-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}:latest', 
+  '--allow-unauthenticated',
   '--region', 'europe-west4', '--platform', 'managed']
+#           /popular-go-articles
