@@ -39,14 +39,14 @@ func getAllPosts(c echo.Context) error {
 
 	if windowLength+pos >= cap(posts) {
 
-		log.Printf("windowLength + pos = %v> cap(posts)=%v", windowLength+pos, cap(posts))
+		logger.Printf("windowLength + pos = %v> cap(posts)=%v", windowLength+pos, cap(posts))
 		windowLength = cap(posts) - 1
-		log.Printf("No change in pos but windowLength = %v", windowLength)
+		logger.Printf("No change in pos but windowLength = %v", windowLength)
 	} else {
 
 		window = make([]StackOverflowRow, windowLength)
 
-		window = posts[pos:windowLength]
+		window = posts[pos : windowLength-1]
 
 		windowLength += windowLength
 		pos += windowLength - 1
@@ -68,7 +68,7 @@ func main() {
 	}
 
 	logger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-
+	logger.INFO("This is info message")
 	e := echo.New()
 
 	e.Use(middleware.Logger())
