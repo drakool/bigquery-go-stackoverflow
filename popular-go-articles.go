@@ -37,10 +37,11 @@ func getAllPosts(c echo.Context) error {
 
 	var window []StackOverflowRow
 
-	if windowLength+pos > cap(posts) {
-		fmt.Printf("windowLength + pos = %v> cap(posts)=%v", windowLength+pos, cap(posts))
-		windowLength = cap(posts)
-		fmt.Printf("No change in pos but windowLength = %v", windowLength)
+	if windowLength+pos >= cap(posts) {
+
+		log.Printf("windowLength + pos = %v> cap(posts)=%v", windowLength+pos, cap(posts))
+		windowLength = cap(posts) - 1
+		log.Printf("No change in pos but windowLength = %v", windowLength)
 	} else {
 		windowLength += windowLength
 		pos = pos + windowLength - 1
@@ -56,6 +57,7 @@ func getAllPosts(c echo.Context) error {
 func main() {
 
 	projectID := os.Getenv("PROJECT_ID")
+
 	if projectID == "" {
 		fmt.Println("GOOGLE_CLOUD_PROJECT environment variable must be set.")
 		os.Exit(1)
@@ -173,6 +175,7 @@ func printResults(w io.Writer, iter *bigquery.RowIterator) error {
 		if err == iterator.Done {
 			return nil
 		}
+
 		if err != nil {
 			return fmt.Errorf("error iterating through results: %w", err)
 		}
