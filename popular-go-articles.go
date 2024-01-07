@@ -37,17 +37,18 @@ func getAllPosts(c echo.Context) error {
 
 	var window []StackOverflowRow
 
-	if windowLength > len(window) {
-		windowLength = len(window)
+	if windowLength > len(posts) {
+		windowLength = len(posts)
 	} else {
 		windowLength += windowLength
 	}
 
-	if pos > len(window) {
+	window = make([]StackOverflowRow, windowLength)
+
+	if pos > len(posts) {
 		pos = pos
 	} else {
 		pos += windowLength
-
 	}
 
 	window = posts[pos:windowLength]
