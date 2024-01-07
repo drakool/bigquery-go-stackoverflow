@@ -68,7 +68,7 @@ func main() {
 	}
 
 	logger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-	logger.INFO("This is info message")
+	logger.Println("This is info message")
 	e := echo.New()
 
 	e.Use(middleware.Logger())
