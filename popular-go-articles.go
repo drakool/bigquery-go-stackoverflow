@@ -185,7 +185,7 @@ func printResults(w io.Writer, iter *bigquery.RowIterator) error {
 		if err != nil {
 			return fmt.Errorf("error iterating through results: %w", err)
 		}
-		logger.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
+		logger.Printf("title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
 		//fmt.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
 	}
 }
