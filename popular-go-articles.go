@@ -38,6 +38,7 @@ func getAllPosts(c echo.Context) error {
 	var window []StackOverflowRow
 	window = posts[pos:windowLength]
 	pos += windowLength
+	windowLength += windowLength
 	return c.JSON(http.StatusOK, window)
 
 }
