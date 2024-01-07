@@ -35,7 +35,10 @@ import (
 
 func getAllPosts(c echo.Context) error {
 
-	return c.JSON(http.StatusOK, posts)
+	var window []StackOverflowRow
+	window = posts[pos:windowLength]
+	pos += windowLength
+	return c.JSON(http.StatusOK, window)
 
 }
 
@@ -86,6 +89,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	pos = 0
+	windowLength = 10
+
 	e.Logger.Fatal(e.Start(":" + httpPort))
 
 }
@@ -109,7 +115,7 @@ func query(ctx context.Context, client *bigquery.Client) (*bigquery.RowIterator,
 			q.comment_count > 10 and
 			q.creation_date between timestamp(DATE_SUB(current_date(), INTERVAL 2 year)) and timestamp(current_date())
 		ORDER BY view_count DESC
-		LIMIT 10;`)
+		LIMIT 100;`)
 	return query.Read(ctx)
 	// [END bigquery_simple_app_query]
 }
@@ -125,7 +131,9 @@ type StackOverflowRow struct {
 }
 
 var (
-	posts []StackOverflowRow
+	posts        []StackOverflowRow
+	pos          int
+	windowLength int
 )
 
 func getPosts(iter *bigquery.RowIterator) error {
