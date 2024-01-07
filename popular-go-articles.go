@@ -43,16 +43,20 @@ func getAllPosts(c echo.Context) error {
 		windowLength = cap(posts) - 1
 		log.Printf("No change in pos but windowLength = %v", windowLength)
 	} else {
+
+		window = make([]StackOverflowRow, windowLength)
+
+		window = posts[pos:windowLength]
+
 		windowLength += windowLength
-		pos = pos + windowLength - 1
+		pos += windowLength - 1
 	}
 
-	window = make([]StackOverflowRow, windowLength)
-
-	window = posts[pos:windowLength]
 	return c.JSON(http.StatusOK, window)
 
 }
+
+var logger *log.Logger
 
 func main() {
 
@@ -62,6 +66,8 @@ func main() {
 		fmt.Println("GOOGLE_CLOUD_PROJECT environment variable must be set.")
 		os.Exit(1)
 	}
+
+	logger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 
 	e := echo.New()
 
@@ -84,14 +90,14 @@ func main() {
 
 	client, err := bigquery.NewClient(ctx, projectID)
 	if err != nil {
-		log.Fatalf("bigquery.NewClient: %v", err)
+		logger.Fatalf("bigquery.NewClient: %v", err)
 	}
 	defer client.Close()
 	// [END bigquery_simple_app_client]
 
 	rows, err := query(ctx, client)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	/*if err := printResults(os.Stdout, rows); err != nil {
@@ -99,7 +105,7 @@ func main() {
 	}*/
 
 	if err := getPosts(rows); err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	pos = 0
@@ -179,7 +185,7 @@ func printResults(w io.Writer, iter *bigquery.RowIterator) error {
 		if err != nil {
 			return fmt.Errorf("error iterating through results: %w", err)
 		}
-		fmt.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
+		logger.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
 		//fmt.Fprintf(w, "title: %s createion-date: %v url: %s views: %d\n", row.Title, row.CreationDate, row.URL, row.ViewCount)
 	}
 }
