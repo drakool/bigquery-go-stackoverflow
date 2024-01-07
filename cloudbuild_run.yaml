@@ -34,7 +34,7 @@ steps:
   # Docker Build
 - name: 'gcr.io/cloud-builders/docker'  
   args: ['build', '-t', 
-  'europe-west4-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}',
+  'us-central1-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}',
   '-f',
   'Dockerfile', '.']
 
@@ -43,11 +43,11 @@ steps:
 
 # Docker push to Google Artifact Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'europe-west4-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}']
+  args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}']
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['run', 'deploy', '${_APP_NAME}', 
-  '--image=europe-west4-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}:latest', 
-  '--allow-unauthenticated',
-  '--region', 'europe-west4', '--platform', 'managed']
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   args: ['run', 'deploy', '${_APP_NAME}', 
+#   '--image=us-central1-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/${_APP_NAME}:latest', 
+#   '--allow-unauthenticated',
+#   '--region', 'us-central1', '--platform', 'managed']
 #           /popular-go-articles
