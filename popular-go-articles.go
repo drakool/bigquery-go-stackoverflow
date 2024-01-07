@@ -37,19 +37,16 @@ func getAllPosts(c echo.Context) error {
 
 	var window []StackOverflowRow
 
-	if windowLength > len(posts) {
-		windowLength = len(posts)
+	if windowLength+pos > cap(posts) {
+		fmt.Printf("windowLength + pos = %v> cap(posts)=%v", windowLength+pos, cap(posts))
+		windowLength = cap(posts)
+		fmt.Printf("No change in pos but windowLength = %v", windowLength)
 	} else {
 		windowLength += windowLength
+		pos = pos + windowLength - 1
 	}
 
 	window = make([]StackOverflowRow, windowLength)
-
-	if pos > len(posts) {
-		pos = pos
-	} else {
-		pos += windowLength
-	}
 
 	window = posts[pos:windowLength]
 	return c.JSON(http.StatusOK, window)
